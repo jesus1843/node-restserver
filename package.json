@@ -1,0 +1,15 @@
+{
+  "name": "07-restserver",
+  "version": "1.0.0",
+  "description": "REST Server con NodeJS y MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "J Jesus",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4"
+  }
+}
