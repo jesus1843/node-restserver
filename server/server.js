@@ -1,7 +1,9 @@
 require('./config/config');
 
 const express = require('express');
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+
 const app = express();
 
 // parse application/x-www-form-urlencoded
@@ -10,36 +12,13 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.get('/usuario', function (req, res) {
-  res.json('get usuario');
+app.use(require('./routes/user'));
+
+mongoose.connect(process.env.URLDB, { useFindAndModify: false, useCreateIndex: true, useNewUrlParser: true }, (err, res) => {
+  if (err) throw new Error(`No se pudo conectar a la base de datos en ese puerto. Error: \n`, err);
+  console.log('Base de datos ONLINE!');
 });
 
-app.post('/usuario', function (req, res) {
-  let body = req.body;
-
-  if (body.nombre === undefined) {
-    res.status(400).json({
-      ok: false,
-      message: 'El nombre es necesario'
-    });
-  } else {
-    res.json({
-      persona: body
-    });
-  }
-});
-
-app.put('/usuario/:id', function (req, res) {
-  let id = req.params.id;
-  res.json({
-    "ID introducido es":id
-  });
-});
-
-app.delete('/usuario', function (req, res) {
-  res.json('delete usuario');
-});
- 
 app.listen(process.env.PORT, () => {
   console.log('Escuchando puerto', process.env.PORT);
 });
