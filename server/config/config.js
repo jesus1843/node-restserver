@@ -11,6 +11,19 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'dev';
 
 
 //====================
+// Vencimiento del token
+//====================
+// 60 segundos x 60 minutos x 24 horas x 30 días
+process.env.CADUCIDAD_TOKEN = 60 * 60 * 24 * 30;
+
+
+//====================
+// SEED de autenticación
+//====================
+process.env.SEED = process.env.SEED || 'este-es-el-seed-desarrollo';
+
+
+//====================
 // Base de Datos
 //====================
 let urlDB;
@@ -18,7 +31,7 @@ let urlDB;
 if (process.env.NODE_ENV === 'dev') {
   urlDB = 'mongodb://localhost:27017/cafe';
 } else {
-  urlDB = 'mongodb://jjesus:Jj12243648@ds259079.mlab.com:59079/restserver-curso-node';
+  urlDB = process.env.MONGO_URI;
 }
 
 process.env.URLDB = urlDB;

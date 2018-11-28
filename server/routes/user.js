@@ -1,36 +1,58 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const _ = require('underscore');
+
 const Usuario = require('../models/user');
+const { tokenVerification, adminRoleVerification } = require('../middlewares/authentication');
 
 const app = express();
 
-app.get('/usuario', function (req, res) {
-  let from = Number(req.query.from || 0) - 1;
-  let lim = Number(req.query.lim || 5);
+app.get('/usuario', tokenVerification, (req, res) => {
+  if (req.query.lim && req.query.from) {
+    let from = Number(req.query.from || 0);
+    let lim = Number(req.query.lim || 5);
 
-  Usuario.find({ state: true }, 'name email role state google')
-    .skip(from)
-    .limit(lim)
-    .exec((err, users) => {
-      if (err) {
-        return res.status(400).json({
-          ok: false,
-          err
-        });
-      }
+    Usuario.find({ state: true }, 'name email role state google')
+      .skip(from)
+      .limit(lim)
+      .exec((err, users) => {
+        if (err) {
+          return res.status(400).json({
+            ok: false,
+            err
+          });
+        }
 
-      Usuario.countDocuments({ state: true }, (err, quantity) => { // count() es viejo
-        res.json({
-          ok: true,
-          users,
-          totalUsers: quantity
+        Usuario.countDocuments({ state: true }, (err, quantity) => { // count() es viejo
+          res.json({
+            ok: true,
+            users,
+            totalUsers: quantity
+          });
         });
       });
-    });
+  } else {
+    Usuario.find({ state: true }, 'name email role state google')
+      .exec((err, users) => {
+        if (err) {
+          return res.status(400).json({
+            ok: false,
+            err
+          });
+        }
+
+        Usuario.countDocuments({ state: true }, (err, quantity) => { // count() es viejo
+          res.json({
+            ok: true,
+            users,
+            totalUsers: quantity
+          });
+        });
+      });
+  }
 });
 
-app.post('/usuario', function (req, res) {
+app.post('/usuario', [tokenVerification, adminRoleVerification], function (req, res) {
   let body = req.body;
 
   let user = new Usuario({
@@ -59,7 +81,7 @@ app.post('/usuario', function (req, res) {
 
 });
 
-app.put('/usuario/:id', function (req, res) {
+app.put('/usuario/:id', [tokenVerification, adminRoleVerification], function (req, res) {
   let id = req.params.id;
   let body = _.pick(req.body, ['name','email','img','role','state']);
 
@@ -87,7 +109,7 @@ app.put('/usuario/:id', function (req, res) {
   // });
 });
 
-app.delete('/usuario/:id', function (req, res) {
+app.delete('/usuario/:id', [tokenVerification, adminRoleVerification], function (req, res) {
   let id = req.params.id;
   let changeState = {
     state: false
