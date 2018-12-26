@@ -63,7 +63,6 @@ app.post('/usuario', [tokenVerification, adminRoleVerification], function (req, 
   });
 
   user.save((err, userDB) => {
-
     if (err) {
       return res.status(400).json({
         ok: false,
